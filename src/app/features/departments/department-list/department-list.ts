@@ -21,11 +21,122 @@ export class DepartmentList {
   showModal = false;
   modalMode: 'view' | 'edit' = 'view';
   selectedDepartment: Department | null = null;
+  showAddModal = false;
+  newDepartment: Department = {
+    id: 0,
+    name: '',
+    description: '',
+    head: '',
+    numEmployees: 0,
+    createdAt: new Date()
+  };
+  sortColumn: keyof Department | '' = '';
+  sortDirection: 'asc' | 'desc' = 'asc';
 
   constructor(private departmentService: DepartmentService) {}
 
   ngOnInit() {
+    this.departments = this.loadDepartments();
+  }
+
+  loadDepartments(): Department[] {
+    const data = localStorage.getItem('departments');
+    if (data) {
+      const parsed = JSON.parse(data);
+      // Convert createdAt back to Date
+      return parsed.map((d: any) => ({ ...d, createdAt: new Date(d.createdAt) }));
+    }
+    // Fallback to service's mock data
+    const depts = this.departmentService.getDepartments();
+    localStorage.setItem('departments', JSON.stringify(depts));
+    return depts;
+  }
+
+  saveDepartments() {
+    localStorage.setItem('departments', JSON.stringify(this.departments));
+  }
+
+  addDepartment(dept: Omit<Department, 'id' | 'createdAt'>) {
+    const newDept = this.departmentService.addDepartment(dept);
     this.departments = this.departmentService.getDepartments();
+    this.saveDepartments();
+    return newDept;
+  }
+
+  updateDepartment(updated: Department) {
+    this.departmentService.updateDepartment(updated);
+    this.departments = this.departmentService.getDepartments();
+    this.saveDepartments();
+  }
+
+  deleteDepartmentById(id: number) {
+    this.departmentService.deleteDepartment(id);
+    this.departments = this.departmentService.getDepartments();
+    this.saveDepartments();
+  }
+
+  saveNewDepartment(dept: Department) {
+    this.addDepartment({
+      name: dept.name,
+      description: dept.description,
+      head: dept.head,
+      numEmployees: dept.numEmployees
+    });
+    this.departments = this.loadDepartments();
+    this.closeAddModal();
+  }
+
+  saveDepartment(updated: Department) {
+    this.updateDepartment(updated);
+    this.departments = this.loadDepartments();
+    this.selectedDepartment = { ...updated };
+    this.modalMode = 'view';
+  }
+
+  deleteDepartment(dept: Department) {
+    if (confirm(`Are you sure you want to delete the department "${dept.name}"?`)) {
+      this.deleteDepartmentById(dept.id);
+      this.departments = this.loadDepartments();
+      this.closeModal();
+    }
+  }
+
+  // Sorting logic
+  setSort(column: keyof Department) {
+    if (this.sortColumn === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    }
+  }
+
+  get sortedDepartments(): Department[] {
+    if (!this.sortColumn) return this.filteredDepartments;
+    const column = this.sortColumn;
+    return [...this.filteredDepartments].sort((a, b) => {
+      const valA = a[column];
+      const valB = b[column];
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        return this.sortDirection === 'asc'
+          ? valA.localeCompare(valB)
+          : valB.localeCompare(valA);
+      }
+      if (typeof valA === 'number' && typeof valB === 'number') {
+        return this.sortDirection === 'asc' ? valA - valB : valB - valA;
+      }
+      if (valA instanceof Date && valB instanceof Date) {
+        return this.sortDirection === 'asc'
+          ? valA.getTime() - valB.getTime()
+          : valB.getTime() - valA.getTime();
+      }
+      return 0;
+    });
+  }
+
+  get pagedDepartments(): Department[] {
+    const start = (this.page - 1) * this.pageSize;
+    return this.sortedDepartments.slice(start, start + this.pageSize);
   }
 
   get filteredDepartments(): Department[] {
@@ -39,11 +150,6 @@ export class DepartmentList {
       );
     }
     return filtered;
-  }
-
-  get pagedDepartments(): Department[] {
-    const start = (this.page - 1) * this.pageSize;
-    return this.filteredDepartments.slice(start, start + this.pageSize);
   }
 
   get totalPages(): number {
@@ -78,18 +184,19 @@ export class DepartmentList {
     this.selectedDepartment = null;
   }
 
-  deleteDepartment(dept: Department) {
-    if (confirm(`Are you sure you want to delete the department "${dept.name}"?`)) {
-      this.departmentService.deleteDepartment(dept.id);
-      this.departments = this.departmentService.getDepartments();
-      this.closeModal();
-    }
+  openAddModal() {
+    this.showAddModal = true;
+    this.newDepartment = {
+      id: 0,
+      name: '',
+      description: '',
+      head: '',
+      numEmployees: 1,
+      createdAt: new Date()
+    };
   }
 
-  saveDepartment(updated: Department) {
-    this.departmentService.updateDepartment(updated);
-    this.departments = this.departmentService.getDepartments();
-    this.selectedDepartment = { ...updated };
-    this.modalMode = 'view';
+  closeAddModal() {
+    this.showAddModal = false;
   }
 }

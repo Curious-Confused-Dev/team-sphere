@@ -1,10 +1,10 @@
 <div *ngIf="department" class="max-w-lg mx-auto py-8">
   <div class="bg-white rounded-lg shadow p-6">
     <ng-container *ngIf="mode === 'view'; else editForm">
-      <h2 class="text-2xl font-bold mb-4 text-blue-700">{{ department.name }}</h2>
-      <div class="mb-2"><span class="font-semibold">Description:</span> {{ department.description }}</div>
-      <div class="mb-2"><span class="font-semibold">Head:</span> {{ department.head }}</div>
-      <div class="mb-2"><span class="font-semibold"># Employees:</span> {{ department.numEmployees }}</div>
+      <h2 class="text-2xl font-bold mb-4 text-blue-700 truncate break-all" title="{{ department.name }}">{{ department.name }}</h2>
+      <div class="mb-2"><span class="font-semibold">Description:</span> <span class="break-all">{{ department.description }}</span></div>
+      <div class="mb-2"><span class="font-semibold">Head:</span> <span class="break-all">{{ department.head }}</span></div>
+      <div class="mb-2"><span class="font-semibold">Employees:</span> {{ department.numEmployees }}</div>
       <div class="mb-2"><span class="font-semibold">Created At:</span> {{ department.createdAt | date:'mediumDate' }}</div>
       <div class="flex gap-2 mt-6">
         <button (click)="startEdit()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">Edit</button>
@@ -12,26 +12,27 @@
       </div>
     </ng-container>
     <ng-template #editForm>
-      <h2 class="text-2xl font-bold mb-4 text-blue-700">Edit Department</h2>
+      <h2 class="text-2xl font-bold mb-4 text-blue-700">{{ department.id ? 'Edit' : 'Add' }} Department</h2>
       <form (ngSubmit)="saveEdit()" autocomplete="off" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium mb-1">Name</label>
-          <input type="text" [(ngModel)]="editDepartment!.name" name="name" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+          <label class="block text-sm font-medium mb-1">Name <span class="text-red-500">*</span></label>
+          <input type="text" [(ngModel)]="editDepartment!.name" name="name" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 truncate" required maxlength="50" />
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Description</label>
-          <input type="text" [(ngModel)]="editDepartment!.description" name="description" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+          <input type="text" [(ngModel)]="editDepartment!.description" name="description" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 break-all" maxlength="100" />
         </div>
         <div>
-          <label class="block text-sm font-medium mb-1">Head</label>
-          <input type="text" [(ngModel)]="editDepartment!.head" name="head" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+          <label class="block text-sm font-medium mb-1">Head <span class="text-red-500">*</span></label>
+          <input type="text" [(ngModel)]="editDepartment!.head" name="head" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 break-all" required maxlength="50" />
         </div>
         <div>
-          <label class="block text-sm font-medium mb-1"># Employees</label>
-          <input type="number" [(ngModel)]="editDepartment!.numEmployees" name="numEmployees" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required min="0" />
+          <label class="block text-sm font-medium mb-1">Employees <span class="text-red-500">*</span></label>
+          <input type="number" [(ngModel)]="editDepartment!.numEmployees" name="numEmployees" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required min="1" max="500" />
+          <div *ngIf="editDepartment!.numEmployees < 1 || editDepartment!.numEmployees > 500" class="text-red-500 text-xs mt-1">Number of employees must be between 1 and 500.</div>
         </div>
         <div class="flex gap-2 mt-6">
-          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Save</button>
+          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition" [disabled]="!editDepartment!.name || !editDepartment!.head || editDepartment!.numEmployees < 1 || editDepartment!.numEmployees > 500">Save</button>
           <button type="button" (click)="cancelEdit()" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 transition">Cancel</button>
         </div>
       </form>
