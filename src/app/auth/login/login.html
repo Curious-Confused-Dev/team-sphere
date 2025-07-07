@@ -1,8 +1,52 @@
-<div class="max-w-sm mx-auto py-12">
-  <h2 class="text-2xl font-bold mb-6 text-blue-700">Login</h2>
-  <form (ngSubmit)="login()" class="space-y-4">
-    <input [(ngModel)]="username" name="username" placeholder="Username" class="w-full px-4 py-2 border rounded" required />
-    <input [(ngModel)]="password" name="password" type="password" placeholder="Password" class="w-full px-4 py-2 border rounded" required />
-    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">Login</button>
-  </form>
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100">
+  <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
+    <div class="flex justify-center mb-6">
+      <img src="/assets/logo.png" alt="TeamSphere" class="h-10" *ngIf="false" />
+      <span class="text-2xl font-bold text-blue-700 tracking-tight">TeamSphere</span>
+    </div>
+    <div class="flex mb-6 border-b">
+      <button (click)="switchMode('email')" [class.text-blue-600]="mode === 'email'" class="flex-1 py-2 font-medium border-b-2" [class.border-blue-600]="mode === 'email'" [class.border-transparent]="mode !== 'email'">Email Login</button>
+      <button (click)="switchMode('mobile')" [class.text-blue-600]="mode === 'mobile'" class="flex-1 py-2 font-medium border-b-2" [class.border-blue-600]="mode === 'mobile'" [class.border-transparent]="mode !== 'mobile'">Mobile Login</button>
+    </div>
+    <form *ngIf="mode === 'email'" (ngSubmit)="loginWithEmail()" autocomplete="off" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium mb-1">Email</label>
+        <input type="email" [(ngModel)]="email" name="email" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+        <div *ngIf="emailError" class="text-red-500 text-xs mt-1">{{ emailError }}</div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Password</label>
+        <div class="relative">
+          <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" name="password" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 pr-10" required />
+          <button type="button" (click)="showHidePassword()" class="absolute right-2 top-2 text-gray-400 hover:text-gray-700">
+            <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12c1.676 4.019 5.822 7.5 10.066 7.5 2.042 0 3.97-.613 5.566-1.66M21.12 15.804A10.477 10.477 0 0022.066 12c-1.676-4.019-5.822-7.5-10.066-7.5-1.523 0-2.98.276-4.32.783M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm-6 0a6 6 0 1112 0 6 6 0 01-12 0z" /></svg>
+          </button>
+        </div>
+        <div *ngIf="passwordError" class="text-red-500 text-xs mt-1">{{ passwordError }}</div>
+      </div>
+      <div *ngIf="loginError" class="text-red-500 text-xs mt-1">{{ loginError }}</div>
+      <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded transition">Login</button>
+    </form>
+    <form *ngIf="mode === 'mobile'" (ngSubmit)="verifyOtp()" autocomplete="off" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium mb-1">Mobile Number</label>
+        <input type="tel" [(ngModel)]="mobile" name="mobile" maxlength="10" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+        <div *ngIf="mobileError" class="text-red-500 text-xs mt-1">{{ mobileError }}</div>
+      </div>
+      <div *ngIf="!otpSent">
+        <button type="button" (click)="sendOtp()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded transition">Send OTP</button>
+      </div>
+      <div *ngIf="otpSent" class="space-y-2">
+        <div class="flex items-center gap-2">
+          <input type="text" [(ngModel)]="otp" name="otp" maxlength="6" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Enter OTP" required />
+          <button type="button" (click)="sendOtp()" [disabled]="otpTimer > 0" class="bg-gray-200 text-gray-700 px-3 py-2 rounded hover:bg-gray-300 transition">Resend OTP <span *ngIf="otpTimer > 0">({{ otpTimer }})</span></button>
+        </div>
+        <div *ngIf="otpValue" class="text-xs text-gray-400">(Mock OTP: <span class="font-mono">{{ otpValue }}</span>)</div>
+        <div *ngIf="otpError" class="text-red-500 text-xs mt-1">{{ otpError }}</div>
+        <div *ngIf="otpLoginError" class="text-red-500 text-xs mt-1">{{ otpLoginError }}</div>
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded transition">Verify OTP</button>
+      </div>
+    </form>
+  </div>
 </div> 

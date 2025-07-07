@@ -54,6 +54,6 @@
   </app-modal>
 
   <app-modal [open]="showAddModal" (closed)="closeAddModal()">
-    <app-department-detail [department]="newDepartment" [mode]="'edit'" (close)="closeAddModal()" (save)="saveNewDepartment($event)"></app-department-detail>
+    <app-department-detail [department]="newDepartment" [mode]="'add'" (close)="closeAddModal()" (save)="saveNewDepartment($event)"></app-department-detail>
   </app-modal>
 </div>

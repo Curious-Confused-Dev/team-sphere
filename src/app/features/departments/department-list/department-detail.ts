@@ -12,20 +12,20 @@ import { FormsModule } from '@angular/forms';
 })
 export class DepartmentDetail {
   @Input() department?: Department;
-  @Input() mode: 'view' | 'edit' = 'view';
+  @Input() mode: 'view' | 'edit' | 'add' = 'view';
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<Department>();
 
   editDepartment: Department | null = null;
 
   ngOnInit() {
-    if (this.mode === 'edit' && this.department) {
+    if ((this.mode === 'edit' || this.mode === 'add') && this.department) {
       this.editDepartment = {
         id: this.department.id ?? 0,
         name: this.department.name ?? '',
         description: this.department.description ?? '',
         head: this.department.head ?? '',
-        numEmployees: this.department.numEmployees ?? 0,
+        numEmployees: this.department.numEmployees ?? 1,
         createdAt: this.department.createdAt ?? new Date()
       };
     }
@@ -39,7 +39,7 @@ export class DepartmentDetail {
         name: this.department.name ?? '',
         description: this.department.description ?? '',
         head: this.department.head ?? '',
-        numEmployees: this.department.numEmployees ?? 0,
+        numEmployees: this.department.numEmployees ?? 1,
         createdAt: this.department.createdAt ?? new Date()
       };
     }
@@ -53,7 +53,9 @@ export class DepartmentDetail {
   saveEdit() {
     if (this.editDepartment) {
       this.save.emit({ ...this.editDepartment });
-      this.mode = 'view';
+      if (this.mode === 'edit') {
+        this.mode = 'view';
+      }
       this.editDepartment = null;
     }
   }

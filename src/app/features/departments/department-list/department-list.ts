@@ -19,7 +19,7 @@ export class DepartmentList {
   page = 1;
   pageSize = 5;
   showModal = false;
-  modalMode: 'view' | 'edit' = 'view';
+  modalMode: 'view' | 'edit' | 'add' = 'view';
   selectedDepartment: Department | null = null;
   showAddModal = false;
   newDepartment: Department = {
@@ -186,6 +186,8 @@ export class DepartmentList {
 
   openAddModal() {
     this.showAddModal = true;
+    this.modalMode = 'add';
+    this.selectedDepartment = null;
     this.newDepartment = {
       id: 0,
       name: '',

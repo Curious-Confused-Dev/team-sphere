@@ -4,7 +4,10 @@ import { Login } from './login/login';
 
 @NgModule({
   imports: [
-    RouterModule.forChild([{ path: '', component: Login }]),
+    RouterModule.forChild([
+      { path: '', component: Login },
+      { path: 'login', component: Login }
+    ]),
     Login
   ]
 })
