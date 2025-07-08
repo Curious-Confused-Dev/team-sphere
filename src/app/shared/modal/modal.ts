@@ -12,12 +12,49 @@ export class Modal {
   @Input() open = false;
   @Output() closed = new EventEmitter<void>();
 
+  private previouslyFocused: HTMLElement | null = null;
+
   constructor(private el: ElementRef) {}
 
-  @HostListener('document:keydown.escape', ['$event'])
-  onEsc(event: Event) {
+  ngOnChanges() {
+    if (this.open) {
+      this.previouslyFocused = document.activeElement as HTMLElement;
+      setTimeout(() => {
+        const modalContent = this.el.nativeElement.querySelector('.modal-content');
+        if (modalContent) {
+          (modalContent as HTMLElement).focus();
+        }
+      });
+    } else if (this.previouslyFocused) {
+      setTimeout(() => this.previouslyFocused?.focus(), 0);
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEsc() {
     if (this.open) {
       this.close();
+    }
+  }
+
+  @HostListener('document:keydown.tab', ['$event'])
+  trapTab(event: any) {
+    if (!this.open) return;
+    const modal = this.el.nativeElement.querySelector('.modal-content');
+    if (!modal) return;
+    const focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    const first = focusable[0] as HTMLElement;
+    const last = focusable[focusable.length - 1] as HTMLElement;
+    if (event.shiftKey) {
+      if (document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      }
+    } else {
+      if (document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     }
   }
 

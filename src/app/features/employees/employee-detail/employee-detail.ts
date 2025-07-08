@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EmployeeService, Employee } from '../employee.service';
 import { CommonModule } from '@angular/common';
@@ -13,8 +13,10 @@ import { FormsModule } from '@angular/forms';
 })
 export class EmployeeDetail {
   @Input() employee?: Employee;
+  @Input() mode: 'view' | 'edit' | 'add' = 'view';
   @Output() backToList = new EventEmitter<void>();
   @Output() employeeUpdated = new EventEmitter<Employee>();
+  @Output() save = new EventEmitter<Employee>();
 
   editMode = false;
   editEmployee: Employee | null = null;
@@ -26,17 +28,38 @@ export class EmployeeDetail {
   ) {}
 
   ngOnInit() {
-    if (!this.employee) {
+    if (this.mode === 'add') {
+      this.editMode = true;
+      this.editEmployee = {
+        id: 0,
+        name: '',
+        department: '',
+        domain: '',
+        email: '',
+        role: ''
+      };
+    } else if (!this.employee) {
       const id = Number(this.route.snapshot.paramMap.get('id'));
       this.employee = this.employeeService.getEmployeeById(id);
     }
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['mode'] && this.mode === 'add') {
+      this.editMode = true;
+      this.editEmployee = {
+        id: 0,
+        name: '',
+        department: '',
+        domain: '',
+        email: '',
+        role: ''
+      };
+    }
+  }
+
   backToListHandler() {
     this.backToList.emit();
-    if (!this.employee) {
-      this.router.navigate(['/employees']);
-    }
   }
 
   startEdit() {
@@ -51,10 +74,14 @@ export class EmployeeDetail {
 
   saveEdit() {
     if (this.editEmployee) {
-      this.employee = { ...this.editEmployee };
-      this.employeeUpdated.emit(this.employee);
-      this.editMode = false;
-      this.editEmployee = null;
+      if (this.mode === 'add') {
+        this.save.emit({ ...this.editEmployee });
+      } else {
+        this.employee = { ...this.editEmployee };
+        this.employeeUpdated.emit(this.employee);
+        this.editMode = false;
+        this.editEmployee = null;
+      }
     }
   }
 }

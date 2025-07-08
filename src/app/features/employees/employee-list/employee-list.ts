@@ -6,6 +6,7 @@ import { Modal } from '../../../shared/modal/modal';
 import { EmployeeDetail } from '../employee-detail/employee-detail';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ToastService } from '../../../shared/toast/toast.service';
 
 @Component({
   selector: 'app-employee-list',
@@ -21,8 +22,10 @@ export class EmployeeList {
   searchTerm = '';
   page = 1;
   pageSize = 5;
+  showAddModal = false;
+  modalMode: 'view' | 'edit' | 'add' = 'view';
 
-  constructor(private employeeService: EmployeeService) {}
+  constructor(private employeeService: EmployeeService, private toast: ToastService) {}
 
   ngOnInit() {
     this.employees = this.employeeService.getEmployees();
@@ -30,6 +33,7 @@ export class EmployeeList {
 
   viewEmployee(employee: Employee) {
     this.selectedEmployee = employee;
+    this.modalMode = 'view';
     this.showModal = true;
   }
 
@@ -39,16 +43,18 @@ export class EmployeeList {
   }
 
   deleteEmployee(employee: Employee) {
-    // TODO: Implement delete logic
-    alert('Delete: ' + employee.name);
+    this.employeeService.deleteEmployee(employee.id);
+    this.employees = this.employeeService.getEmployees();
+    this.toast.show('Employee deleted successfully', 'error');
+    this.closeModal();
   }
 
   updateEmployee(updated: Employee) {
-    const idx = this.employees.findIndex(e => e.id === updated.id);
-    if (idx !== -1) {
-      this.employees[idx] = { ...updated };
-      this.selectedEmployee = { ...updated };
-    }
+    this.employeeService.updateEmployee(updated);
+    this.employees = this.employeeService.getEmployees();
+    this.selectedEmployee = null;
+    this.showModal = false;
+    this.toast.show('Employee updated successfully', 'success');
   }
 
   get filteredEmployees(): Employee[] {
@@ -87,7 +93,25 @@ export class EmployeeList {
   }
 
   editEmployee(employee: Employee) {
-    // Placeholder for future edit functionality
-    this.viewEmployee(employee); // For now, just open the modal in view mode
+    this.selectedEmployee = employee;
+    this.modalMode = 'edit';
+    this.showModal = true;
+  }
+
+  openAddModal() {
+    this.modalMode = 'add';
+    this.selectedEmployee = null;
+    this.showAddModal = true;
+  }
+
+  closeAddModal() {
+    this.showAddModal = false;
+  }
+
+  addEmployee(newEmployee: Employee) {
+    this.employeeService.addEmployee(newEmployee);
+    this.employees = this.employeeService.getEmployees();
+    this.toast.show('Employee added successfully', 'success');
+    this.closeAddModal();
   }
 }

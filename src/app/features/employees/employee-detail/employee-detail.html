@@ -1,47 +1,63 @@
-<div *ngIf="employee" class="max-w-lg mx-auto py-8">
-  <div class="bg-white rounded-lg shadow p-6">
-    <ng-container *ngIf="!editMode; else editForm">
-      <h2 class="text-2xl font-bold mb-4 text-blue-700">{{ employee?.name }}</h2>
-      <div class="mb-2"><span class="font-semibold">Department:</span> {{ employee?.department }}</div>
-      <div class="mb-2"><span class="font-semibold">Domain:</span> {{ employee?.domain }}</div>
-      <div class="mb-2"><span class="font-semibold">Email:</span> {{ employee?.email }}</div>
-      <div class="mb-2"><span class="font-semibold">Role:</span> {{ employee?.role }}</div>
-      <div class="flex gap-2 mt-6">
-        <button (click)="startEdit()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">Edit</button>
-        <button (click)="backToListHandler()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Back to List</button>
+<div *ngIf="employee || mode === 'add'" class="max-w-lg mx-auto py-8">
+  <div class="bg-white rounded-2xl shadow-2xl p-8 relative animate-fadeInModal">
+    <ng-container *ngIf="!editMode && mode !== 'add'; else editForm">
+      <div class="mb-6">
+        <h2 class="text-2xl font-extrabold text-blue-700">Employee Details</h2>
+      </div>
+      <div class="mb-4">
+        <div class="text-lg font-semibold text-gray-800 mb-1">{{ employee?.name }}</div>
+        <div class="text-sm text-gray-500 mb-2">{{ employee?.role }}</div>
+        <div class="mb-2"><span class="font-semibold">Department:</span> {{ employee?.department }}</div>
+        <div class="mb-2"><span class="font-semibold">Domain:</span> {{ employee?.domain }}</div>
+        <div class="mb-2"><span class="font-semibold">Email:</span> {{ employee?.email }}</div>
+      </div>
+      <div class="flex gap-2 mt-6 justify-end">
+        <button (click)="startEdit()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-semibold">Edit</button>
       </div>
     </ng-container>
     <ng-template #editForm>
-      <h2 class="text-2xl font-bold mb-4 text-blue-700">Edit Employee</h2>
+      <div class="mb-6">
+        <h2 class="text-2xl font-extrabold text-blue-700">{{ mode === 'add' ? 'Add Employee' : 'Edit Employee' }}</h2>
+      </div>
       <form (ngSubmit)="saveEdit()" autocomplete="off" class="space-y-4">
         <div>
           <label class="block text-sm font-medium mb-1">Name</label>
-          <input type="text" [(ngModel)]="editEmployee!.name" name="name" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+          <input type="text" [(ngModel)]="editEmployee!.name" name="name" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required minlength="2" maxlength="50" />
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Department</label>
-          <input type="text" [(ngModel)]="editEmployee!.department" name="department" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+          <input type="text" [(ngModel)]="editEmployee!.department" name="department" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required minlength="2" maxlength="50" />
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Domain</label>
-          <input type="text" [(ngModel)]="editEmployee!.domain" name="domain" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+          <input type="text" [(ngModel)]="editEmployee!.domain" name="domain" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required minlength="2" maxlength="50" />
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Email</label>
-          <input type="email" [(ngModel)]="editEmployee!.email" name="email" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+          <input type="email" [(ngModel)]="editEmployee!.email" name="email" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$" maxlength="100" />
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Role</label>
-          <input type="text" [(ngModel)]="editEmployee!.role" name="role" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+          <input type="text" [(ngModel)]="editEmployee!.role" name="role" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required minlength="2" maxlength="50" />
         </div>
-        <div class="flex gap-2 mt-6">
-          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Save</button>
-          <button type="button" (click)="cancelEdit()" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 transition">Cancel</button>
+        <div class="flex gap-2 mt-6 justify-end">
+          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-semibold">Save</button>
+          <button type="button" (click)="mode === 'add' ? backToListHandler() : cancelEdit()" class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition font-semibold">Cancel</button>
         </div>
       </form>
     </ng-template>
   </div>
 </div>
-<div *ngIf="!employee" class="text-center py-8 text-red-500">
+<div *ngIf="!employee && mode !== 'add'" class="text-center py-8 text-red-500">
   Employee not found.
 </div>
+
+<style>
+  .animate-fadeInModal {
+    animation: fadeInModal 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+  @keyframes fadeInModal {
+    from { opacity: 0; transform: translateY(40px) scale(0.95); }
+    to { opacity: 1; transform: none; }
+  }
+</style>

@@ -10,3 +10,6 @@ import { CommonModule } from '@angular/common';
   ]
 })
 export class SharedModule { }
+
+// TODO: Add Toast to exports after creation
+// export { ToastComponent } from './toast/toast';

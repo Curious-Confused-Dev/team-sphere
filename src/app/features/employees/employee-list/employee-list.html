@@ -1,8 +1,9 @@
 <div class="overflow-x-auto">
   <h2 class="text-2xl font-bold mb-4 text-blue-700">Employees</h2>
 
-  <div class="flex items-center mb-4 gap-2">
+  <div class="flex items-center mb-4 gap-2 justify-between">
     <input type="text" placeholder="Search employees..." [(ngModel)]="searchTerm" (ngModelChange)="onSearch($event)" class="border rounded px-3 py-2 w-full max-w-xs focus:outline-none focus:ring-2 focus:ring-blue-400" />
+    <button (click)="openAddModal()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition" title="Add Employee">Add Employee</button>
   </div>
 
   <app-table [columns]="['name', 'department', 'domain', 'email', 'role']" [data]="pagedEmployees" [actions]="[true]">
@@ -29,6 +30,10 @@
   </div>
 
   <app-modal [open]="showModal" (closed)="closeModal()">
-    <app-employee-detail *ngIf="selectedEmployee" [employee]="selectedEmployee" (backToList)="closeModal()" (employeeUpdated)="updateEmployee($event)"></app-employee-detail>
+    <app-employee-detail *ngIf="selectedEmployee" [employee]="selectedEmployee" [mode]="modalMode" (backToList)="closeModal()" (employeeUpdated)="updateEmployee($event)"></app-employee-detail>
+  </app-modal>
+
+  <app-modal [open]="showAddModal" (closed)="closeAddModal()">
+    <app-employee-detail [mode]="'add'" (backToList)="closeAddModal()" (save)="addEmployee($event)"></app-employee-detail>
   </app-modal>
 </div>
