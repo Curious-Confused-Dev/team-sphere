@@ -1,24 +1,23 @@
-<ng-container *ngIf="mode === 'view'; else editForm">
-  <h2 class="text-2xl font-bold mb-4 text-blue-700">{{ domain.name }}</h2>
-  <div class="mb-2"><span class="font-semibold">Type:</span> {{ domain.type }}</div>
-  <div class="flex gap-2 mt-6 justify-end">
-    <button (click)="startEdit()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-semibold">Edit</button>
-  </div>
-</ng-container>
-<ng-template #editForm>
-  <h2 class="text-2xl font-bold mb-4 text-blue-700">{{ mode === 'add' ? 'Add' : 'Edit' }} Domain</h2>
-  <form (ngSubmit)="saveEdit()" autocomplete="off" class="space-y-4">
+<div class="space-y-4">
+  <h2 class="text-2xl font-bold mb-4 text-blue-700">
+    {{ mode === 'add' ? 'Add Domain' : mode === 'edit' ? 'Edit Domain' : 'Domain Details' }}
+  </h2>
+  <form *ngIf="mode === 'add' || mode === 'edit'" (ngSubmit)="saveEdit()" autocomplete="off" class="space-y-4">
     <div>
-      <label class="block text-sm font-medium mb-1">Name <span class="text-red-500">*</span></label>
-      <input type="text" [(ngModel)]="editDomain.name" name="name" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required maxlength="50" />
+      <label class="block text-sm font-medium mb-1">Name</label>
+      <input type="text" [(ngModel)]="editDomain.name" name="name" class="w-full border rounded px-3 py-2" required />
     </div>
     <div>
-      <label class="block text-sm font-medium mb-1">Type <span class="text-red-500">*</span></label>
-      <input type="text" [(ngModel)]="editDomain.type" name="type" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required maxlength="50" />
+      <label class="block text-sm font-medium mb-1">Type</label>
+      <input type="text" [(ngModel)]="editDomain.type" name="type" class="w-full border rounded px-3 py-2" required />
     </div>
     <div class="flex gap-2 mt-6 justify-end">
-      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-semibold">Save</button>
-      <button type="button" (click)="close.emit()" class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition font-semibold">Cancel</button>
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Save</button>
+      <button type="button" (click)="close.emit()" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 transition">Cancel</button>
     </div>
   </form>
-</ng-template> 
+  <div *ngIf="mode === 'view'">
+    <div><b>Name:</b> {{ domain.name }}</div>
+    <div><b>Type:</b> {{ domain.type }}</div>
+  </div>
+</div> 
