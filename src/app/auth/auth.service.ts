@@ -15,9 +15,9 @@ export class AuthService {
     {
       id: 1,
       name: 'Admin User',
-      email: 'admin@example.com',
+      email: 'admin@teamsphere.com',
       mobile: '9999999999',
-      password: 'admin123',
+      password: 'admin@123',
       avatarUrl: ''
     }
   ];

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { Department } from '../department.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -19,7 +19,26 @@ export class DepartmentDetail {
   editDepartment: Department | null = null;
 
   ngOnInit() {
-    if ((this.mode === 'edit' || this.mode === 'add') && this.department) {
+    this.initEditDepartment();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['mode'] || changes['department']) {
+      this.initEditDepartment();
+    }
+  }
+
+  initEditDepartment() {
+    if (this.mode === 'add') {
+      this.editDepartment = {
+        id: 0,
+        name: '',
+        description: '',
+        head: '',
+        numEmployees: 1,
+        createdAt: new Date()
+      };
+    } else if (this.mode === 'edit' && this.department) {
       this.editDepartment = {
         id: this.department.id ?? 0,
         name: this.department.name ?? '',

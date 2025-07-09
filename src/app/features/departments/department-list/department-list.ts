@@ -5,6 +5,7 @@ import { Modal } from '../../../shared/modal/modal';
 import { DepartmentDetail } from './department-detail';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ToastService } from '../../../shared/toast/toast.service';
 
 @Component({
   selector: 'app-department-list',
@@ -33,7 +34,7 @@ export class DepartmentList {
   sortColumn: keyof Department | '' = '';
   sortDirection: 'asc' | 'desc' = 'asc';
 
-  constructor(private departmentService: DepartmentService) {}
+  constructor(private departmentService: DepartmentService, private toast: ToastService) {}
 
   ngOnInit() {
     this.departments = this.loadDepartments();
@@ -94,11 +95,10 @@ export class DepartmentList {
   }
 
   deleteDepartment(dept: Department) {
-    if (confirm(`Are you sure you want to delete the department "${dept.name}"?`)) {
-      this.deleteDepartmentById(dept.id);
-      this.departments = this.loadDepartments();
-      this.closeModal();
-    }
+    this.deleteDepartmentById(dept.id);
+    this.departments = this.loadDepartments();
+    this.closeModal();
+    this.toast.show('Department deleted successfully', 'error');
   }
 
   // Sorting logic
