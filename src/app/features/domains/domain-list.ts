@@ -2,12 +2,13 @@ import { Component } from '@angular/core';
 import { Modal } from '../../shared/modal/modal';
 import { DomainDetail } from './domain-detail';
 import { ToastService } from '../../shared/toast/toast.service';
+import { CommonModule } from '@angular/common';
 // TODO: import DomainDetail when created
 
 @Component({
   selector: 'app-domain-list',
   standalone: true,
-  imports: [Modal, DomainDetail],
+  imports: [CommonModule, Modal, DomainDetail],
   templateUrl: './domain-list.html',
   styleUrl: './domain-list.css'
 })
@@ -84,6 +85,6 @@ export class DomainList {
   deleteDomain(domain: any) {
     this.domains = this.domains.filter(d => d !== domain);
     this.saveDomains();
-    this.toast.show('Domain deleted successfully', 'success');
+    this.toast.show('Domain deleted successfully', 'error');
   }
 } 
