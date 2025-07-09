@@ -14,6 +14,8 @@ import { FormsModule } from '@angular/forms';
 export class EmployeeDetail {
   @Input() employee?: Employee;
   @Input() mode: 'view' | 'edit' | 'add' = 'view';
+  @Input() departments: string[] = [];
+  @Input() domains: string[] = [];
   @Output() backToList = new EventEmitter<void>();
   @Output() employeeUpdated = new EventEmitter<Employee>();
   @Output() save = new EventEmitter<Employee>();

@@ -7,6 +7,7 @@ import { EmployeeDetail } from '../employee-detail/employee-detail';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../../shared/toast/toast.service';
+import { DepartmentService } from '../../departments/department.service';
 
 @Component({
   selector: 'app-employee-list',
@@ -24,11 +25,20 @@ export class EmployeeList {
   pageSize = 5;
   showAddModal = false;
   modalMode: 'view' | 'edit' | 'add' = 'view';
+  showDeleteConfirm = false;
+  employeeToDelete: Employee | null = null;
+  departments: string[] = [];
+  domains: string[] = [];
 
-  constructor(private employeeService: EmployeeService, private toast: ToastService) {}
+  constructor(private employeeService: EmployeeService, private toast: ToastService, private departmentService: DepartmentService) {}
 
   ngOnInit() {
     this.employees = this.employeeService.getEmployees();
+    // Load departments from injected service
+    this.departments = this.departmentService.getDepartments().map(d => d.name);
+    // Load domains
+    const domainsRaw = localStorage.getItem('domains');
+    this.domains = domainsRaw ? JSON.parse(domainsRaw).map((d: any) => d.name) : [];
   }
 
   viewEmployee(employee: Employee) {
@@ -113,5 +123,26 @@ export class EmployeeList {
     this.employees = this.employeeService.getEmployees();
     this.toast.show('Employee added successfully', 'success');
     this.closeAddModal();
+  }
+
+  confirmDelete(employee: Employee) {
+    this.employeeToDelete = employee;
+    this.showDeleteConfirm = true;
+  }
+
+  cancelDelete() {
+    this.showDeleteConfirm = false;
+    this.employeeToDelete = null;
+  }
+
+  proceedDelete() {
+    if (this.employeeToDelete) {
+      this.employeeService.deleteEmployee(this.employeeToDelete.id);
+      this.employees = this.employeeService.getEmployees();
+      this.toast.show('Employee deleted successfully', 'error');
+      this.closeModal();
+    }
+    this.showDeleteConfirm = false;
+    this.employeeToDelete = null;
   }
 }

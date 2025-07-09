@@ -19,29 +19,38 @@
       <div class="mb-6">
         <h2 class="text-2xl font-extrabold text-blue-700">{{ mode === 'add' ? 'Add Employee' : 'Edit Employee' }}</h2>
       </div>
-      <form (ngSubmit)="saveEdit()" autocomplete="off" class="space-y-4">
+      <form #empForm="ngForm" (ngSubmit)="saveEdit()" autocomplete="off" class="space-y-4">
         <div>
           <label class="block text-sm font-medium mb-1">Name</label>
           <input type="text" [(ngModel)]="editEmployee!.name" name="name" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required minlength="2" maxlength="50" />
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Department</label>
-          <input type="text" [(ngModel)]="editEmployee!.department" name="department" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required minlength="2" maxlength="50" />
+          <select [(ngModel)]="editEmployee!.department" name="department" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+            <option value="" disabled selected>Select department</option>
+            <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
+          </select>
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Domain</label>
-          <input type="text" [(ngModel)]="editEmployee!.domain" name="domain" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required minlength="2" maxlength="50" />
+          <select [(ngModel)]="editEmployee!.domain" name="domain" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+            <option value="" disabled selected>Select domain</option>
+            <option *ngFor="let dom of domains" [value]="dom">{{ dom }}</option>
+          </select>
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Email</label>
-          <input type="email" [(ngModel)]="editEmployee!.email" name="email" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$" maxlength="100" />
+          <input type="email" [(ngModel)]="editEmployee!.email" name="email" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$" maxlength="100" #emailModel="ngModel" />
+          <div *ngIf="emailModel.invalid && (emailModel.dirty || emailModel.touched)" class="text-red-500 text-xs mt-1">
+            Please enter a valid email address.
+          </div>
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Role</label>
           <input type="text" [(ngModel)]="editEmployee!.role" name="role" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required minlength="2" maxlength="50" />
         </div>
         <div class="flex gap-2 mt-6 justify-end">
-          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-semibold">Save</button>
+          <button type="submit" [disabled]="empForm.invalid" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-semibold">Save</button>
           <button type="button" (click)="mode === 'add' ? backToListHandler() : cancelEdit()" class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition font-semibold">Cancel</button>
         </div>
       </form>
